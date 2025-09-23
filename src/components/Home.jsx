@@ -1,5 +1,7 @@
 import React from "react";
 import PageHeading from "./PageHeading";
+import products from "../data/products";
+import ProductListings from "./ProductListings";
 
 function Home() {
   return (
@@ -10,6 +12,7 @@ function Home() {
         impedit corrupti ad, error quibusdam earum neque temporibus repudiandae
         voluptate praesentium.
       </PageHeading>
+      <ProductListings products={products} />
     </div>
   );
 }
