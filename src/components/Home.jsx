@@ -1,4 +1,3 @@
-import React from "react";
 import PageHeading from "./PageHeading";
 import products from "../data/products";
 import ProductListings from "./ProductListings";

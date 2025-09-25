@@ -1,4 +1,3 @@
-import React from "react";
 import Price from "./Price";
 
 export default function ProductCard({ product }) {
