@@ -4,8 +4,7 @@ import ProductListings from "./ProductListings";
 
 function Home() {
   return (
-    <div className="home-container">
-      <h1 className="text-3xl font-bold underline">TailWind CSS</h1>
+    <div className="max-w-[1152px] mx-auto px-6 py-8">
       <PageHeading title="Explore Crazy Stickers!">
         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo ducimus
         aut laborum aliquam unde accusantium voluptates ipsam omnis reiciendis,
