@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import PageTitle from "./PageTitle";
-import { Form } from "react-router-dom";
+import { Form, useActionData, useNavigation } from "react-router-dom";
+import apiClient from "../api/apiClient";
+import { toast } from "react-toastify";
 
 export default function Contact() {
+  const actionData = useActionData();
+  const formRef = useRef(null);
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+  useEffect(() => {
+    if (actionData?.success) {
+      formRef.current?.reset();
+      toast.success("Your data has been saved successfully!");
+    }
+  }, [actionData]);
   const labelStyle =
     "block text-sm font-semibold text-primary dark:text-light mb-1";
   const textFieldStyle =
     "w-full px-2 py-1 text-base border rounded-md transition border-primary dark:border-light focus:ring focus:ring-dark dark:focus:ring-lighter focus:outline-none text-gray-800 dark:text-lighter bg-white dark:bg-gray-600 placeholder-gray-400 dark:placeholder-gray-300";
-  const isSubmitting = false;
   return (
     <div className="max-w-[1052px] min-h-[752px] mx-auto px-6 py-4 font-primary bg-normalbg dark:bg-darkbg">
       {/* Page Title */}
@@ -21,7 +32,7 @@ export default function Contact() {
       {/* Contact Form */}
       <Form
         method="POST"
-        onSubmit={() => {}}
+        ref={formRef}
         className="space-y-6 max-w-[768px] mx-auto"
       >
         {/* Name Field */}
@@ -39,6 +50,11 @@ export default function Contact() {
             minLength={5}
             maxLength={30}
           />
+          {actionData?.errors?.name && (
+            <p className="text-red-500 text-sm mt-1">
+              {actionData.errors?.name}
+            </p>
+          )}
         </div>
 
         {/* Email and mobile Row */}
@@ -51,11 +67,14 @@ export default function Contact() {
             <input
               id="email"
               name="email"
-              type="email"
               placeholder="Your Email"
               className={textFieldStyle}
-              required
             />
+            {actionData?.errors?.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {actionData.errors?.email}
+              </p>
+            )}
           </div>
 
           {/* Mobile Field */}
@@ -73,6 +92,11 @@ export default function Contact() {
               placeholder="Your Mobile Number"
               className={textFieldStyle}
             />
+            {actionData?.errors?.mobileNumber && (
+              <p className="text-red-500 text-sm mt-1">
+                {actionData.errors?.mobileNumber}
+              </p>
+            )}
           </div>
         </div>
 
@@ -91,13 +115,17 @@ export default function Contact() {
             minLength={5}
             maxLength={500}
           ></textarea>
+          {actionData?.errors?.message && (
+            <p className="text-red-500 text-sm mt-1">
+              {actionData.errors?.message}
+            </p>
+          )}
         </div>
 
         {/* Submit Button */}
         <div className="text-center">
           <button
             type="submit"
-            disabled={isSubmitting}
             className="px-3 py-1 text-white dark:text-black text-sm rounded-md transition duration-200 bg-primary dark:bg-light hover:bg-dark dark:hover:bg-lighter"
           >
             {isSubmitting ? "Submitting..." : "Submit"}
@@ -106,4 +134,25 @@ export default function Contact() {
       </Form>
     </div>
   );
+}
+
+export async function contactAction({ request, params }) {
+  const data = await request.formData();
+  const contactData = {
+    name: data.get("name"),
+    email: data.get("email"),
+    mobileNumber: data.get("mobileNumber"),
+    message: data.get("message"),
+  };
+  try {
+    await apiClient.post("/contacts", contactData);
+    return { success: true };
+  } catch (error) {
+    if (error.response?.status == 400) {
+      return { success: false, errors: error.response?.data };
+    }
+    throw new Response(error.response?.data?.errorMessage || "Failed to save", {
+      status: error.status || 500,
+    });
+  }
 }

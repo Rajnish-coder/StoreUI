@@ -18,9 +18,11 @@ function Home() {
       const response = await apiClient.get("/product");
       setProducts(response.data);
     } catch (error) {
-      setError(
-        error.response?.data?.error ||
-          "Error in loading data! Please try again."
+      throw new Response(
+        error.response?.data?.errorMessage ||
+          error.message ||
+          "Failed to fetch products. Please try again.",
+        { status: error.status || 500 }
       );
     } finally {
       setLoading(false);
